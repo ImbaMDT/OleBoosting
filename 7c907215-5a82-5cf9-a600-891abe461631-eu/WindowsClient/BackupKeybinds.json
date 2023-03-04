@@ -1,0 +1,17 @@
+{
+	"settingsVersion": 13,
+	"actionMappings": [
+		{
+			"name": "EquipLastUsed",
+			"characterName": "None",
+			"bindIndex": 0,
+			"key": "?",
+			"shift": false,
+			"ctrl": false,
+			"alt": false,
+			"cmd": false
+		}
+	],
+	"axisMappings": [],
+	"settingsProfiles": []
+}
