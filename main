@@ -128,7 +128,7 @@ def program_start():
     if os.path.isdir(pathlib.Path(os.getenv('LOCALAPPDATA')) / r'VALORANT\Saved\Config'):
         print("\nFußfetisch Accountsharing")
         print("Mode 1. Show created names")
-        print("Mode 2. Create a backup")
+        print("Mode 2. Backup")
         print("Mode 3. Save your current settings")
         print("Mode 4. Apply settings")
         print("Mode 5. Quit")
