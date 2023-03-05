@@ -9,6 +9,12 @@ import json
 
 warnings.filterwarnings(action='ignore')
 
+def show_saved(data):
+    if data == {}:
+        print('No data.json file found, create a new one with Mode: 3')
+    else:
+        print(data)
+
 def saveJson(data): # create or overrides existing json file
     with open('data.json', 'w') as fp:
         json.dump(data, fp, sort_keys=True, indent=4)
@@ -18,7 +24,6 @@ def loadJson(): # loads the json file to dict
         with open('data.json', 'r') as fp:
             data = json.load(fp)
     except:
-        print('No Json file found, create a new one')
         data = {}
     return data
     
@@ -63,13 +68,24 @@ def copytree(src, dst, symlinks=False, ignore=None):    # takes source and saves
     if errors:
         raise errors
     
-def backup():   # make a backup from saves folder
+def backup_apply():   # applys the saved backup to the normal valorant folder
+    if os.path.isdir('backup'):
+        backup_path = "backup\Saved\Config"
+        destination_dir = pathlib.Path(os.getenv('LOCALAPPDATA')) / r'VALORANT\Saved\Config'
+        copytree(backup_path, destination_dir)
+        print("Successfully applied the backup! \n")
+    else:
+        print("create a backup first")
+    
+def backup_save():   # make a backup from saves folder
     backup_path = pathlib.Path(os.getenv('LOCALAPPDATA')) / r'VALORANT\Saved\Config'
     destination_dir = "backup\Saved\Config"
-    copytree(backup_path, destination_dir, False, None)
+    print(backup_path)
+    print(destination_dir)
+    copytree(backup_path, destination_dir)
+    print("Successfully created a backup! \n")
 
-
-def saveSettingslocal():    # saves the current account folder and creates a json dic with a userinput name
+def saveSettingslocal(data):    # saves the current account folder and creates a json dic with a userinput name
     RiotLocalMachine_path = pathlib.Path(os.getenv('LOCALAPPDATA')) / r'VALORANT\Saved\Config\Windows\RiotLocalMachine.ini'
     if not RiotLocalMachine_path.is_file():
         raise RuntimeError('Last Account not found')
@@ -83,53 +99,70 @@ def saveSettingslocal():    # saves the current account folder and creates a jso
     destination_dir = "saves/" + localuser
     print("Type a name for your Account")
     userinput = str(input("Name: "))
-    data = loadJson()
     if not localuser in data.values() and not userinput in data.keys():
         data [userinput] = localuser
         saveJson(data)
         copytree(localsettings_path, destination_dir, False, None)
+        print("Settings successfully saved! \n")
     elif localname in data.values():
         print('name already exists')
     else:
         print('save already exists')
 
 def pastSettingslocal(data):
-    print("Type your Account you want to copy the settings from.")
-    src = str(input("Name: "))
-    print("Type your account you want to paste the settings to.")
-    dst = str(input("Name: "))
-    localfile = data[src]
-    localfile2 = data[dst]
-    print(localfile, localfile2)
+    if data == {}:
+        print('No data.json file found, create a new one with Mode: 3')
+    else:
+        print("Type your Account you want to copy the settings from.")
+        src = str(input("Name: "))
+        print("Type your account you want to paste the settings to.")
+        dst = str(input("Name: "))
+        source_dir = "saves/" + data[src]
+        localname = "VALORANT/Saved/Config/" + data[dst]
+        destination_dir = pathlib.Path(os.getenv('LOCALAPPDATA')) / localname
+        copytree(source_dir, destination_dir)
+        print("Settings successfully applied! \n")
     
 
 def program_start():
-
-    print("Fußfetisch Accountsharing")
-    print("Mode 1. Create a backup")
-    print("Mode 2. Save your current settings")
-    print("Mode 3. Apply settings")
-    print("Mode 4. Quit")
-    userinput = int(input("Mode: "))
-    while True:
-        if userinput == 1:
-            backup()
-            print("Successfully backup! \n")
-            program_start()
-        elif userinput == 2:
-            saveSettingslocal()
-            print("Settings successfully saved! \n")
-            program_start()
-        elif userinput == 3:
+    if os.path.isdir(pathlib.Path(os.getenv('LOCALAPPDATA')) / r'VALORANT\Saved\Config'):
+        print("\nFußfetisch Accountsharing")
+        print("Mode 1. Show created names")
+        print("Mode 2. Create a backup")
+        print("Mode 3. Save your current settings")
+        print("Mode 4. Apply settings")
+        print("Mode 5. Quit")
+        userinput = int(input("Mode: "))
+        while True:
             data = loadJson()
-            pastSettingslocal(data)
-            print("Settings successfully applied! \n")
-            program_start()
-        elif userinput == 4:
-            quit()  
-        else:
-            print("Open VALORANT or enter the right number! \n")
-            quit()
+            if userinput == 1:
+                show_saved(data)
+                program_start()
+            elif userinput == 2:
+                print("Mode 1. Create a backup")
+                print("Mode 2. Apply the backup")
+                userinput = int(input("Mode: "))
+                if userinput == 1:
+                    backup_save()
+                elif userinput == 2:
+                    backup_apply()
+                else:
+                    print("you have to type a number \n")
+                    quit()
+                program_start()
+            elif userinput == 3:
+                saveSettingslocal(data)
+                program_start()
+            elif userinput == 4:
+                pastSettingslocal(data)
+                program_start() 
+            elif userinput == 5:
+                quit()  
+            else:
+                print("you have to type a number \n")
+                quit()
+    else:
+        print('no valorant settings found')
 
 print(r'''
       ____  _      ____                  _   _                                  
